@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+from __future__ import division
 from random import Random
 from time import time
-from math import sin
+from math import cos
 from math import sqrt
+from math import sin
+from math import radians
 import matplotlib.pyplot as plt
 
 num_intervals = 100
@@ -73,7 +76,25 @@ def duration(candidate):
 
     return t_total
 
-def brachistone():
+
+def frange(x, y, step):
+    while x + 0.000000005 < y:
+        yield x
+        x += step
+
+def actual(a):
+    x = []
+    y = []
+
+    for theta in frange(0.0, 90.0, 90.0/101):
+        theta = radians(theta)
+        x.append(a/2.0 * (theta - sin(theta)))
+        y.append(a/2.0 * (1.0 - cos(theta)))
+    
+    return x, y
+    
+
+def brachistochrone():
     initial = [(float(i) / num_intervals) for i in range(num_intervals)]
     initial.append(1.0)
     initial.reverse()
@@ -81,18 +102,30 @@ def brachistone():
     rand.seed(int(time()))
     real = initial[:]
     
-    opt = find_optimal(initial[:], 10000, rand)
+    k = find_optimal(initial[:], 1000, rand)
+    print duration(k)
+    tenk = find_optimal(k[:], 10000, rand)
+    print duration(tenk)
+    #hundk = find_optimal(tenk[:], 100000, rand)
+    #print duration(hundk)
 
-    print(opt)
-    print duration(opt)
     initial.reverse()
-    plt.plot(initial, opt, '-', lw=2)
+    plt.plot(initial, k, '-', lw=2)
+    plt.plot(initial, tenk, '-', lw=2)
+    #plt.plot(initial, hundk, '-', lw=2)
 
-    plt.plot(initial, real, '-', lw=2)
+
+    plt.plot(initial, initial, '-', lw=2)
+    real = actual(2.0)
+    initial.reverse()
+
+    plt.plot(initial, real[1], '-', lw=2)
+    print duration(real[1])
+    print duration(initial)
 
     plt.title('Brachistochrone')
     plt.grid(True)
-    plt.show
+    plt.show()
 
 if __name__ == '__main__':
     brachistone()
